@@ -197,4 +197,64 @@ function nextStep(step){
     case 'invite_yes':
       app.innerHTML = `
         <img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">
-        <h2
+        <h2>Oczekuj na dalsze informacje! 🎁✨</h2>
+      `;
+      addConfetti();
+      break;
+  }
+}
+
+// Sprawdzenie hasła
+function checkPassword(){
+  const pw = document.getElementById('password').value.toLowerCase().replace(/\s/g,'');
+  if(pw === 'czasnaherbate'){
+    nextStep('step4');
+  } else {
+    alert("Niepoprawne hasło, spróbuj ponownie!");
+  }
+}
+
+// Funkcja dodająca emotki
+function addEmojis(list){
+  for(let i=0;i<7;i++){
+    const emoji = document.createElement('div');
+    emoji.className='emoji';
+    emoji.style.left=Math.random()*90+'vw';
+    emoji.style.top=Math.random()*70+'vh';
+    emoji.textContent=list[Math.floor(Math.random()*list.length)];
+    result.appendChild(emoji);
+  }
+}
+
+// Prosty efekt konfetti
+function addConfetti(){
+  const ctx = confettiCanvas.getContext('2d');
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+  let confettis = [];
+  for(let i=0;i<100;i++){
+    confettis.push({
+      x: Math.random()*confettiCanvas.width,
+      y: Math.random()*confettiCanvas.height,
+      r: Math.random()*6+4,
+      d: Math.random()*20
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    confettis.forEach(c=>{
+      ctx.beginPath();
+      ctx.arc(c.x,c.y,c.r,0,2*Math.PI);
+      ctx.fillStyle='hsl('+Math.random()*360+',100%,50%)';
+      ctx.fill();
+      c.y += 2;
+      if(c.y>confettiCanvas.height){ c.y=0; }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+</script>
+
+</body>
+</html>
