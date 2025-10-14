@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zaproszenie</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f4ef;
+      text-align: center;
+      padding-top: 80px;
+      transition: background-color 0.5s;
+    }
+    button {
+      background-color: #ffd6d6;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #ffc0cb;
+    }
+    #quiz {
+      display: none;
+    }
+    #emotki {
+      font-size: 2em;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- EKRAN STARTOWY -->
+  <div id="intro">
+    <h2>Zanim zaczniemy...</h2>
+    <p>Naciśnij przycisk, żeby włączyć muzykę 🎵</p>
+    <button id="playMusic">Odtwórz muzykę</button>
+    <p id="nextStepContainer" style="display:none;">Teraz przejdźmy dalej ⬇️</p>
+    <button id="nextStep" style="display:none;">Dalej</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz">
+    <h2>Czy przyjmujesz zaproszenie?</h2>
+    <button id="yesBtn">Tak 💕</button>
+    <button id="noBtn">Nie 💔</button>
+    <div id="emotki"></div>
+  </div>
+
+  <audio id="bgMusic" src="muzyka.mp3"></audio>
+
+  <script>
+    const music = document.getElementById('bgMusic');
+    const playBtn = document.getElementById('playMusic');
+    const nextBtn = document.getElementById('nextStep');
+    const nextStepContainer = document.getElementById('nextStepContainer');
+    const intro = document.getElementById('intro');
+    const quiz = document.getElementById('quiz');
+    const emotki = document.getElementById('emotki');
+
+    // Odtwarzanie muzyki po kliknięciu
+    playBtn.addEventListener('click', () => {
+      music.play();
+      playBtn.style.display = 'none';
+      nextStepContainer.style.display = 'block';
+      nextBtn.style.display = 'inline-block';
+    });
+
+    // Przejście do quizu
+    nextBtn.addEventListener('click', () => {
+      intro.style.display = 'none';
+      quiz.style.display = 'block';
+    });
+
+    // Webhook Discorda (Twój)
+    const webhookURL = "https://discord.com/api/webhooks/1427755937191694357/ryjrC7j86B3JNto_TCWkW9E4042XGCQg5zwiBiT6ZjjcHfnDN18b1HCVABXhUnyoPn2q";
+
+    async function sendToDiscord(message) {
+      await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: message })
+      });
+    }
+
+    // Obsługa przycisków
+    document.getElementById('yesBtn').addEventListener('click', () => {
+      document.body.style.backgroundColor = '#ffd1dc';
+      emotki.textContent = '☺️🥰😻💖';
+      sendToDiscord('✅ Ktoś wybrał: TAK 💕');
+    });
+
+    document.getElementById('noBtn').addEventListener('click', () => {
+      document.body.style.backgroundColor = '#a6d8ff';
+      emotki.textContent = '😢😟😿💔';
+      sendToDiscord('❌ Ktoś wybrał: NIE 💔');
+    });
+  </script>
+</body>
+</html>
