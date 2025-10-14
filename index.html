@@ -13,51 +13,31 @@
     transition: background-color 0.5s;
     overflow-x: hidden;
   }
-  h1, h2 {
-    font-size: 2em;
-    margin-bottom: 20px;
-  }
-  p {
-    font-size: 1.2em;
-  }
-  img {
-    max-width: 80%;
-    max-height: 50vh;
-    border-radius: 10px;
-    margin-bottom: 20px;
-  }
-  button {
-    font-size: 1.2em;
-    padding: 12px 25px;
-    margin: 10px;
-    cursor: pointer;
-    border: none;
-    border-radius: 8px;
-  }
-  .emoji {
-    position: absolute;
-    font-size: 2em;
-    animation: float 3s ease-in-out infinite;
-  }
-  @keyframes float {
-    0% { transform: translateY(0); opacity: 1; }
-    50% { transform: translateY(-50px); opacity: 0.7; }
-    100% { transform: translateY(0); opacity: 1; }
-  }
-  #result {
-    position: relative;
-    width: 100%;
-    height: 60vh;
-  }
-  input[type="text"] {
-    font-size: 1.2em;
-    padding: 8px;
-    margin-top: 15px;
-  }
+  h1, h2 { font-size: 2em; margin-bottom: 20px; }
+  p { font-size: 1.2em; }
+  img { max-width: 80%; max-height: 50vh; border-radius: 10px; margin-bottom: 20px; }
+  button { font-size: 1.2em; padding: 12px 25px; margin: 10px; cursor: pointer; border: none; border-radius: 8px; }
+  .emoji { position: absolute; font-size: 2em; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-50px); opacity: 0.7; } 100% { transform: translateY(0); opacity: 1; } }
+  #result { position: relative; width: 100%; height: 60vh; }
+  input[type="text"] { font-size: 1.2em; padding: 8px; margin-top: 15px; }
+  #app { display: none; } /* ukrywamy quiz do czasu startu muzyki */
 </style>
 </head>
 <body>
 
+<!-- Audio -->
+<audio id="bgMusic" src="muzyka.mp3"></audio>
+
+<!-- Ekran startowy -->
+<div id="startScreen">
+  <h1>Zanim zaczniemy, naciśnij przycisk, aby uruchomić muzykę 🎶</h1>
+  <button onclick="startMusic()">Włącz muzykę</button>
+  <p>Teraz przejdźmy dalej</p>
+  <button onclick="startQuiz()">Dalej</button>
+</div>
+
+<!-- Quiz -->
 <div id="app">
   <h1>Czy myślałaś kiedyś o stworzeniu własnego naczynia z gliny?</h1>
   <img src="https://zdrowasowa.pl/wp-content/uploads/2022/09/naczynia-gliniane.webp" alt="Naczynia gliniane">
@@ -72,13 +52,33 @@
 <script>
 let app = document.getElementById('app');
 let result = document.getElementById('result');
+let music = document.getElementById('bgMusic');
 
+// --- Funkcje muzyki ---
+function startMusic() {
+  music.play();
+}
+
+function startQuiz() {
+  document.getElementById('startScreen').style.display = 'none';
+  app.style.display = 'block';
+}
+
+// --- Funkcja Discord ---
+function sendToDiscord(message){
+  fetch('https://discord.com/api/webhooks/1427755937191694357/ryjrC7j86B3JNto_TCWkW9E4042XGCQg5zwiBiT6ZjjcHfnDN18b1HCVABXhUnyoPn2q', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content: message })
+  });
+}
+
+// --- Quiz ---
 function nextStep(step, choice){
   result.innerHTML = '';
   switch(step){
-
-    // Krok 1: Pierwsze pytanie
     case 'step1':
+      sendToDiscord("Step1: " + choice);
       if(choice === 'no'){
         app.innerHTML = `
           <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
@@ -87,7 +87,6 @@ function nextStep(step, choice){
         `;
         addEmojis(['😢','😟','😿','💔']);
       } else {
-        // przejście do drugiego pytania
         app.innerHTML = `
           <h1>Czy uważasz, że to fajny sposób na spędzenie wolnego czasu?</h1>
           <img src="https://t3.ftcdn.net/jpg/10/13/19/30/360_F_1013193070_klcvbP6xlx099WgZG0yBhBgOBunZ3GgO.jpg" alt="Spędzenie wolnego czasu">
@@ -98,16 +97,14 @@ function nextStep(step, choice){
         `;
       }
       break;
-
-    // Krok 2: Drugie pytanie
     case 'step2':
+      sendToDiscord("Step2: " + choice);
       if(choice === 'no'){
         app.innerHTML = `
           <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
         `;
         addEmojis(['😢','😟','😿','💔']);
       } else {
-        // przejście do trzeciego pytania
         app.innerHTML = `
           <h1>Co chciałabyś stworzyć?</h1>
           <img src="https://thumbs.dreamstime.com/b/ludzie-tworzący-naczynia-z-ceramiki-ziemnej-starsi-mężczyźni-robiący-na-kole-kobietami-dającymi-mu-kawałek-gliny-którą-237657311.jpg" alt="Tworzenie ceramiki">
@@ -119,10 +116,8 @@ function nextStep(step, choice){
         `;
       }
       break;
-
-    // Krok 3: Wybór obiektu
     case 'step3':
-      // przejście do pytania z hasłem
+      sendToDiscord("Step3: " + choice);
       app.innerHTML = `
         <h2>Mały test na początek 😏</h2>
         <p>Twoja odpowiedź na hasło pokaże, czy jesteś gotowa na kolejny krok</p>
@@ -131,9 +126,8 @@ function nextStep(step, choice){
         <button onclick="checkPassword()">Sprawdź</button>
       `;
       break;
-
-    // Krok 4: Poprawne hasło
     case 'step4':
+      sendToDiscord("Poprawne hasło!");
       app.innerHTML = `
         <h1>Brawo i cieszę się, że dotarłaś do tego momentu!</h1>
         <img src="https://i1.memy.pl/obrazki/f57327570_brawo.jpg" alt="Brawo">
@@ -142,8 +136,6 @@ function nextStep(step, choice){
         </div>
       `;
       break;
-
-    // Krok 5: Zaproszenie
     case 'step5':
       app.innerHTML = `
         <h1>Cześć Beti! 🫶</h1>
@@ -151,7 +143,7 @@ function nextStep(step, choice){
         <p>Wszystko, co będzie potrzebne, już przygotowałem. Dodatkowo gwarantuję dobrą muzykę i świetną atmosferę. 🎶✨</p>
         <p>Kilka rzeczy do zapamiętania:</p>
         <ul style="list-style:none; padding-left:0;">
-          <li>Data: po naszym 4. spotkaniu (dokładny termin podam wcześniej)</li>
+          <li>Data: Zaproszenie zaczyna obowiązywać po naszym 4. spotkaniu (dokładny termin podam wcześniej)</li>
           <li>Miejsce: do tego momentu mój adres powinnaś już znać</li>
           <li>Ubranie luźne, które może się pobrudzić</li>
         </ul>
@@ -162,9 +154,8 @@ function nextStep(step, choice){
         </div>
       `;
       break;
-
-    // Krok 6: Zaproszenie TAK/NIE z emotkami
     case 'invite':
+      sendToDiscord("Zaproszenie: " + choice);
       if(choice === 'no'){
         app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
         addEmojis(['😢','😟','😿','💔']);
@@ -176,7 +167,7 @@ function nextStep(step, choice){
   }
 }
 
-// Funkcja sprawdzająca hasło
+// --- Hasło ---
 function checkPassword(){
   const pw = document.getElementById('password').value.toLowerCase().replace(/\s/g,'');
   if(pw === 'czasnaherbate'){
@@ -186,7 +177,7 @@ function checkPassword(){
   }
 }
 
-// Funkcja do dodawania emotek
+// --- Emotki ---
 function addEmojis(list){
   for(let i=0; i<7; i++){
     const emoji = document.createElement('div');
