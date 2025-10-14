@@ -1,105 +1,137 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zaproszenie</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f4ef;
-      text-align: center;
-      padding-top: 80px;
-      transition: background-color 0.5s;
-    }
-    button {
-      background-color: #ffd6d6;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      margin: 10px;
-      transition: 0.3s;
-    }
-    button:hover {
-      background-color: #ffc0cb;
-    }
-    #quiz {
-      display: none;
-    }
-    #emotki {
-      font-size: 2em;
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body>
-  <!-- EKRAN STARTOWY -->
-  <div id="intro">
-    <h2>Zanim zaczniemy...</h2>
-    <p>Naciśnij przycisk, żeby włączyć muzykę 🎵</p>
-    <button id="playMusic">Odtwórz muzykę</button>
-    <p id="nextStepContainer" style="display:none;">Teraz przejdźmy dalej ⬇️</p>
-    <button id="nextStep" style="display:none;">Dalej</button>
-  </div>
+<script>
+let app = document.getElementById('app');
+let result = document.getElementById('result');
 
-  <!-- QUIZ -->
-  <div id="quiz">
-    <h2>Czy przyjmujesz zaproszenie?</h2>
-    <button id="yesBtn">Tak 💕</button>
-    <button id="noBtn">Nie 💔</button>
-    <div id="emotki"></div>
-  </div>
+// --- Webhook Discorda ---
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1427755937191694357/ryjrC7j86B3JNto_TCWkW9E4042XGCQg5zwiBiT6ZjjcHfnDN18b1HCVABXhUnyoPn2q";
 
-  <audio id="bgMusic" src="muzyka.mp3"></audio>
+// Funkcja wysyłająca dane do Discorda
+function sendToDiscord(message) {
+  fetch(WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content: message })
+  }).catch(err => console.error("Błąd wysyłania do Discorda:", err));
+}
 
-  <script>
-    const music = document.getElementById('bgMusic');
-    const playBtn = document.getElementById('playMusic');
-    const nextBtn = document.getElementById('nextStep');
-    const nextStepContainer = document.getElementById('nextStepContainer');
-    const intro = document.getElementById('intro');
-    const quiz = document.getElementById('quiz');
-    const emotki = document.getElementById('emotki');
+// --- Główna logika ---
+function nextStep(step, choice){
+  result.innerHTML = '';
 
-    // Odtwarzanie muzyki po kliknięciu
-    playBtn.addEventListener('click', () => {
-      music.play();
-      playBtn.style.display = 'none';
-      nextStepContainer.style.display = 'block';
-      nextBtn.style.display = 'inline-block';
-    });
+  // Wysyłanie do Discorda każdej odpowiedzi
+  sendToDiscord(`📩 Odpowiedź: ${step} → ${choice}`);
 
-    // Przejście do quizu
-    nextBtn.addEventListener('click', () => {
-      intro.style.display = 'none';
-      quiz.style.display = 'block';
-    });
+  switch(step){
 
-    // Webhook Discorda (Twój)
-    const webhookURL = "https://discord.com/api/webhooks/1427755937191694357/ryjrC7j86B3JNto_TCWkW9E4042XGCQg5zwiBiT6ZjjcHfnDN18b1HCVABXhUnyoPn2q";
+    case 'step1':
+      if(choice === 'no'){
+        app.innerHTML = `
+          <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
+          <h2 style="color:#654321;">Zastanów się nad tym jeszcze raz 😢</h2>
+          <button onclick="location.reload()">Powrót na start</button>
+        `;
+        addEmojis(['😢','😟','😿','💔']);
+      } else {
+        app.innerHTML = `
+          <h1>Czy uważasz, że to fajny sposób na spędzenie wolnego czasu?</h1>
+          <img src="https://t3.ftcdn.net/jpg/10/13/19/30/360_F_1013193070_klcvbP6xlx099WgZG0yBhBgOBunZ3GgO.jpg" alt="Spędzenie wolnego czasu">
+          <div>
+            <button onclick="nextStep('step2','no')">Nie</button>
+            <button onclick="nextStep('step2','yes')">Tak</button>
+          </div>
+        `;
+      }
+      break;
 
-    async function sendToDiscord(message) {
-      await fetch(webhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: message })
-      });
-    }
+    case 'step2':
+      if(choice === 'no'){
+        app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
+        addEmojis(['😢','😟','😿','💔']);
+      } else {
+        app.innerHTML = `
+          <h1>Co chciałabyś stworzyć?</h1>
+          <img src="https://thumbs.dreamstime.com/b/ludzie-tworzący-naczynia-z-ceramiki-ziemnej-starsi-mężczyźni-robiący-na-kole-kobietami-dającymi-mu-kawałek-gliny-którą-237657311.jpg" alt="Tworzenie ceramiki">
+          <div>
+            <button onclick="nextStep('step3','talerzyk')">Talerzyk</button>
+            <button onclick="nextStep('step3','swiecznik')">Świecznik</button>
+            <button onclick="nextStep('step3','wazon')">Wazon</button>
+          </div>
+        `;
+      }
+      break;
 
-    // Obsługa przycisków
-    document.getElementById('yesBtn').addEventListener('click', () => {
-      document.body.style.backgroundColor = '#ffd1dc';
-      emotki.textContent = '☺️🥰😻💖';
-      sendToDiscord('✅ Ktoś wybrał: TAK 💕');
-    });
+    case 'step3':
+      app.innerHTML = `
+        <h2>Mały test na początek 😏</h2>
+        <p>Twoja odpowiedź na hasło pokaże, czy jesteś gotowa na kolejny krok</p>
+        <p>Jak nazywa się herbaciarnia, w której byliśmy na pierwszym spotkaniu (bez polskich znaków i spacji)?</p>
+        <input type="text" id="password" placeholder="Wpisz hasło">
+        <button onclick="checkPassword()">Sprawdź</button>
+      `;
+      break;
 
-    document.getElementById('noBtn').addEventListener('click', () => {
-      document.body.style.backgroundColor = '#a6d8ff';
-      emotki.textContent = '😢😟😿💔';
-      sendToDiscord('❌ Ktoś wybrał: NIE 💔');
-    });
-  </script>
-</body>
-</html>
+    case 'step4':
+      app.innerHTML = `
+        <h1>Brawo i cieszę się, że dotarłaś do tego momentu!</h1>
+        <img src="https://i1.memy.pl/obrazki/f57327570_brawo.jpg" alt="Brawo">
+        <div>
+          <button onclick="nextStep('step5')">To teraz przejdźmy do konkretów!</button>
+        </div>
+      `;
+      break;
+
+    case 'step5':
+      app.innerHTML = `
+        <h1>Cześć Beti! 🫶</h1>
+        <p>Chciałbym Cię zaprosić na wyjątkowy wieczór lepienia z gliny. 🎨✨</p>
+        <p>Wszystko, co będzie potrzebne, już przygotowałem. Dodatkowo gwarantuję dobrą muzykę i świetną atmosferę. 🎶✨</p>
+        <p>Kilka rzeczy do zapamiętania:</p>
+        <ul style="list-style:none; padding-left:0;">
+          <li>Data: po naszym 4. spotkaniu (dokładny termin podam wcześniej)</li>
+          <li>Miejsce: do tego momentu mój adres powinnaś już znać</li>
+          <li>Ubranie luźne, które może się pobrudzić</li>
+        </ul>
+        <h2>Czy przyjmujesz moje zaproszenie?</h2>
+        <div>
+          <button onclick="nextStep('invite','yes')">TAK</button>
+          <button onclick="nextStep('invite','no')">NIE</button>
+        </div>
+      `;
+      break;
+
+    case 'invite':
+      if(choice === 'no'){
+        app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
+        addEmojis(['😢','😟','😿','💔']);
+      } else {
+        app.innerHTML = `<img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">`;
+        addEmojis(['☺️','🥰','😻','💖']);
+      }
+      break;
+  }
+}
+
+// --- Sprawdzanie hasła ---
+function checkPassword(){
+  const pw = document.getElementById('password').value.toLowerCase().replace(/\s/g,'');
+  if(pw === 'czasnaherbate'){
+    sendToDiscord("✅ Poprawne hasło wpisane: czasnaherbate");
+    nextStep('step4');
+  } else {
+    alert("Niepoprawne hasło, spróbuj ponownie!");
+    sendToDiscord("❌ Niepoprawne hasło: " + pw);
+  }
+}
+
+// --- Animacja emotek ---
+function addEmojis(list){
+  for(let i=0; i<7; i++){
+    const emoji = document.createElement('div');
+    emoji.className = 'emoji';
+    emoji.style.left = Math.random() * 90 + 'vw';
+    emoji.style.top = Math.random() * 70 + 'vh';
+    emoji.textContent = list[Math.floor(Math.random() * list.length)];
+    result.appendChild(emoji);
+  }
+}
+</script>
