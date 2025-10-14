@@ -1,28 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktywne Zaproszenie</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 30px;
+    background-color: #fff8e7;
+    transition: background-color 0.5s;
+    overflow-x: hidden;
+  }
+  h1, h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+  p {
+    font-size: 1.2em;
+  }
+  img {
+    max-width: 80%;
+    max-height: 50vh;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  button {
+    font-size: 1.2em;
+    padding: 12px 25px;
+    margin: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+  }
+  .emoji {
+    position: absolute;
+    font-size: 2em;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(-50px); opacity: 0.7; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  #result {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+  }
+  input[type="text"] {
+    font-size: 1.2em;
+    padding: 8px;
+    margin-top: 15px;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <h1>Czy myślałaś kiedyś o stworzeniu własnego naczynia z gliny?</h1>
+  <img src="https://zdrowasowa.pl/wp-content/uploads/2022/09/naczynia-gliniane.webp" alt="Naczynia gliniane">
+  <div>
+    <button onclick="nextStep('step1','no')">Nie</button>
+    <button onclick="nextStep('step1','yes')">Tak</button>
+  </div>
+</div>
+
+<div id="result"></div>
+
 <script>
 let app = document.getElementById('app');
 let result = document.getElementById('result');
 
-// --- Webhook Discorda ---
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1427755937191694357/ryjrC7j86B3JNto_TCWkW9E4042XGCQg5zwiBiT6ZjjcHfnDN18b1HCVABXhUnyoPn2q";
-
-// Funkcja wysyłająca dane do Discorda
-function sendToDiscord(message) {
-  fetch(WEBHOOK_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content: message })
-  }).catch(err => console.error("Błąd wysyłania do Discorda:", err));
-}
-
-// --- Główna logika ---
 function nextStep(step, choice){
   result.innerHTML = '';
-
-  // Wysyłanie do Discorda każdej odpowiedzi
-  sendToDiscord(`📩 Odpowiedź: ${step} → ${choice}`);
-
   switch(step){
 
+    // Krok 1: Pierwsze pytanie
     case 'step1':
       if(choice === 'no'){
         app.innerHTML = `
@@ -32,6 +87,7 @@ function nextStep(step, choice){
         `;
         addEmojis(['😢','😟','😿','💔']);
       } else {
+        // przejście do drugiego pytania
         app.innerHTML = `
           <h1>Czy uważasz, że to fajny sposób na spędzenie wolnego czasu?</h1>
           <img src="https://t3.ftcdn.net/jpg/10/13/19/30/360_F_1013193070_klcvbP6xlx099WgZG0yBhBgOBunZ3GgO.jpg" alt="Spędzenie wolnego czasu">
@@ -43,11 +99,15 @@ function nextStep(step, choice){
       }
       break;
 
+    // Krok 2: Drugie pytanie
     case 'step2':
       if(choice === 'no'){
-        app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
+        app.innerHTML = `
+          <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
+        `;
         addEmojis(['😢','😟','😿','💔']);
       } else {
+        // przejście do trzeciego pytania
         app.innerHTML = `
           <h1>Co chciałabyś stworzyć?</h1>
           <img src="https://thumbs.dreamstime.com/b/ludzie-tworzący-naczynia-z-ceramiki-ziemnej-starsi-mężczyźni-robiący-na-kole-kobietami-dającymi-mu-kawałek-gliny-którą-237657311.jpg" alt="Tworzenie ceramiki">
@@ -60,7 +120,9 @@ function nextStep(step, choice){
       }
       break;
 
+    // Krok 3: Wybór obiektu
     case 'step3':
+      // przejście do pytania z hasłem
       app.innerHTML = `
         <h2>Mały test na początek 😏</h2>
         <p>Twoja odpowiedź na hasło pokaże, czy jesteś gotowa na kolejny krok</p>
@@ -70,6 +132,7 @@ function nextStep(step, choice){
       `;
       break;
 
+    // Krok 4: Poprawne hasło
     case 'step4':
       app.innerHTML = `
         <h1>Brawo i cieszę się, że dotarłaś do tego momentu!</h1>
@@ -80,6 +143,7 @@ function nextStep(step, choice){
       `;
       break;
 
+    // Krok 5: Zaproszenie
     case 'step5':
       app.innerHTML = `
         <h1>Cześć Beti! 🫶</h1>
@@ -99,6 +163,7 @@ function nextStep(step, choice){
       `;
       break;
 
+    // Krok 6: Zaproszenie TAK/NIE z emotkami
     case 'invite':
       if(choice === 'no'){
         app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
@@ -111,19 +176,17 @@ function nextStep(step, choice){
   }
 }
 
-// --- Sprawdzanie hasła ---
+// Funkcja sprawdzająca hasło
 function checkPassword(){
   const pw = document.getElementById('password').value.toLowerCase().replace(/\s/g,'');
   if(pw === 'czasnaherbate'){
-    sendToDiscord("✅ Poprawne hasło wpisane: czasnaherbate");
     nextStep('step4');
   } else {
     alert("Niepoprawne hasło, spróbuj ponownie!");
-    sendToDiscord("❌ Niepoprawne hasło: " + pw);
   }
 }
 
-// --- Animacja emotek ---
+// Funkcja do dodawania emotek
 function addEmojis(list){
   for(let i=0; i<7; i++){
     const emoji = document.createElement('div');
@@ -135,3 +198,6 @@ function addEmojis(list){
   }
 }
 </script>
+
+</body>
+</html>
