@@ -17,6 +17,9 @@
     font-size: 2em;
     margin-bottom: 20px;
   }
+  p {
+    font-size: 1.2em;
+  }
   img {
     max-width: 80%;
     max-height: 50vh;
@@ -78,8 +81,9 @@ function nextStep(step, choice){
     case 'step1':
       if(choice === 'no'){
         app.innerHTML = `
-          <img src="https://placedog.net/800/600?id=2" alt="Smutny pies">
-          <h2 style="color:white;">Zastanów się nad tym jeszcze raz 😢</h2>
+          <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
+          <h2 style="color:#654321;">Zastanów się nad tym jeszcze raz 😢</h2>
+          <button onclick="location.reload()">Powrót na start</button>
         `;
         addEmojis(['😢','😟','😿','💔']);
       } else {
@@ -99,7 +103,7 @@ function nextStep(step, choice){
     case 'step2':
       if(choice === 'no'){
         app.innerHTML = `
-          <img src="https://placedog.net/800/600?id=2" alt="Smutny pies">
+          <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
         `;
         addEmojis(['😢','😟','😿','💔']);
       } else {
@@ -120,8 +124,9 @@ function nextStep(step, choice){
     case 'step3':
       // przejście do pytania z hasłem
       app.innerHTML = `
-        <h1>Podaj hasło, aby przejść dalej:</h1>
-        <p>(Jak nazywała się herbaciarnia, w której byliśmy na pierwszym spotkaniu? bez polskich znaków)</p>
+        <h2>Mały test na początek 😏</h2>
+        <p>Twoja odpowiedź na hasło pokaże, czy jesteś gotowa na kolejny krok</p>
+        <p>Jak nazywa się herbaciarnia, w której byliśmy na pierwszym spotkaniu (bez polskich znaków i spacji)?</p>
         <input type="text" id="password" placeholder="Wpisz hasło">
         <button onclick="checkPassword()">Sprawdź</button>
       `;
@@ -150,7 +155,6 @@ function nextStep(step, choice){
           <li>Miejsce: do tego momentu mój adres powinnaś już znać</li>
           <li>Ubranie luźne, które może się pobrudzić</li>
         </ul>
-        <p>Nie mogę się doczekać, żeby spędzić z Tobą trochę czasu w kreatywny i… nieco brudny sposób 😄.</p>
         <h2>Czy przyjmujesz moje zaproszenie?</h2>
         <div>
           <button onclick="nextStep('invite','yes')">TAK</button>
@@ -162,10 +166,10 @@ function nextStep(step, choice){
     // Krok 6: Zaproszenie TAK/NIE z emotkami
     case 'invite':
       if(choice === 'no'){
-        app.innerHTML = `<img src="https://placedog.net/800/600?id=2" alt="Smutny pies">`;
+        app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
         addEmojis(['😢','😟','😿','💔']);
       } else {
-        app.innerHTML = `<img src="https://placedog.net/800/600?id=1" alt="Szczęśliwy pies">`;
+        app.innerHTML = `<img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">`;
         addEmojis(['☺️','🥰','😻','💖']);
       }
       break;
@@ -174,7 +178,7 @@ function nextStep(step, choice){
 
 // Funkcja sprawdzająca hasło
 function checkPassword(){
-  const pw = document.getElementById('password').value.toLowerCase();
+  const pw = document.getElementById('password').value.toLowerCase().replace(/\s/g,'');
   if(pw === 'czasnaherbate'){
     nextStep('step4');
   } else {
