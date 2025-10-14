@@ -11,6 +11,7 @@
     padding: 50px;
     background-color: #fff8e7; /* kremowe tło */
     transition: background-color 0.5s;
+    overflow: hidden;
   }
   h1 {
     font-size: 2em;
@@ -23,10 +24,34 @@
     border: none;
     border-radius: 8px;
   }
+  #result {
+    position: relative;
+    width: 100%;
+    height: 75vh; /* 3/4 wysokości ekranu */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
   #result img {
-    width: 200px;
-    margin-top: 20px;
+    max-height: 100%;
     border-radius: 15px;
+  }
+  .heart {
+    position: absolute;
+    font-size: 2em;
+    color: red;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(-50px); opacity: 0.7; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  #message {
+    font-size: 1.5em;
+    margin-top: 20px;
+    color: #333;
   }
 </style>
 </head>
@@ -41,14 +66,43 @@
   const noBtn = document.getElementById('noBtn');
   const result = document.getElementById('result');
 
+  function showResult(imgSrc, bgColor) {
+    // ukryj przyciski
+    yesBtn.style.display = 'none';
+    noBtn.style.display = 'none';
+
+    // zmiana tła
+    document.body.style.backgroundColor = bgColor;
+
+    // dodaj zdjęcie psa
+    const img = document.createElement('img');
+    img.src = imgSrc;
+    img.alt = "Pies";
+    result.appendChild(img);
+
+    // dodaj napis
+    const message = document.createElement('div');
+    message.id = "message";
+    message.textContent = "moje umiejętności nie pozwalają na więcej, więc proszę o wysłanie zdjęcia lub ss odpowiedzi";
+    result.appendChild(message);
+
+    // dodaj kilka serc w losowych miejscach
+    for(let i=0; i<5; i++){
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = Math.random() * 90 + 'vw';
+      heart.style.top = Math.random() * 70 + 'vh';
+      heart.textContent = '❤️';
+      result.appendChild(heart);
+    }
+  }
+
   yesBtn.addEventListener('click', () => {
-    document.body.style.backgroundColor = '#ffc0cb'; // różowe tło
-    result.innerHTML = '<img src="https://placedog.net/400/300?id=1" alt="Szczęśliwy pies">';
+    showResult("https://placedog.net/800/600?id=1", "#ffc0cb"); // różowe tło
   });
 
   noBtn.addEventListener('click', () => {
-    document.body.style.backgroundColor = '00008B'; // niebieskie tło
-    result.innerHTML = '<img src="https://placedog.net/400/300?id=2" alt="Smutny pies">';
+    showResult("https://placedog.net/800/600?id=2", "#00008B"); // niebieskie tło
   });
 </script>
 </body>
