@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zaproszenie</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 50px;
+    background-color: #fff8e7; /* kremowe tło */
+    transition: background-color 0.5s;
+  }
+  h1 {
+    font-size: 2em;
+  }
+  button {
+    font-size: 1.2em;
+    padding: 15px 30px;
+    margin: 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+  }
+  #result img {
+    width: 200px;
+    margin-top: 20px;
+    border-radius: 15px;
+  }
+</style>
+</head>
+<body>
+  <h1>Czy przyjmujesz zaproszenie?</h1>
+  <button id="yesBtn">TAK</button>
+  <button id="noBtn">NIE</button>
+  <div id="result"></div>
+
+<script>
+  const yesBtn = document.getElementById('yesBtn');
+  const noBtn = document.getElementById('noBtn');
+  const result = document.getElementById('result');
+
+  yesBtn.addEventListener('click', () => {
+    document.body.style.backgroundColor = '#ffc0cb'; // różowe tło
+    result.innerHTML = '<img src="https://placedog.net/400/300?id=1" alt="Szczęśliwy pies">';
+  });
+
+  noBtn.addEventListener('click', () => {
+    document.body.style.backgroundColor = '#add8e6'; // niebieskie tło
+    result.innerHTML = '<img src="https://placedog.net/400/300?id=2" alt="Smutny pies">';
+  });
+</script>
+</body>
+</html>
