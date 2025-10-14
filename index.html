@@ -22,6 +22,7 @@
   #result { position: relative; width: 100%; height: 60vh; }
   input[type="text"] { font-size: 1.2em; padding: 8px; margin-top: 15px; }
   #app { display: none; } /* ukrywamy quiz do czasu startu muzyki */
+  #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -48,17 +49,19 @@
 </div>
 
 <div id="result"></div>
+<canvas id="confettiCanvas"></canvas>
 
 <script>
 let app = document.getElementById('app');
 let result = document.getElementById('result');
 let music = document.getElementById('bgMusic');
+let confettiCanvas = document.getElementById('confettiCanvas');
+let confettiCtx = confettiCanvas.getContext('2d');
 
 // --- Funkcje muzyki ---
 function startMusic() {
   music.play();
 }
-
 function startQuiz() {
   document.getElementById('startScreen').style.display = 'none';
   app.style.display = 'block';
@@ -132,9 +135,11 @@ function nextStep(step, choice){
         <h1>Brawo i cieszę się, że dotarłaś do tego momentu!</h1>
         <img src="https://i1.memy.pl/obrazki/f57327570_brawo.jpg" alt="Brawo">
         <div>
-          <button onclick="nextStep('step5')">To teraz przejdźmy do konkretów!</button>
+          <button onclick="setTimeout(() => nextStep('step5'), 300)">To teraz przejdźmy do konkretów!</button>
         </div>
       `;
+      // Konfetti po 3 sekundach
+      setTimeout(() => startConfetti(), 3000);
       break;
     case 'step5':
       app.innerHTML = `
@@ -160,12 +165,12 @@ function nextStep(step, choice){
         app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
         addEmojis(['😢','😟','😿','💔']);
       } else {
-        app.innerHTML = `<img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">`;
+        app.innerHTML = `
+          <img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">
+          <h2>Oczekuj na kolejne informacje! ✨</h2>
+        `;
         addEmojis(['☺️','🥰','😻','💖']);
-        
-      }<h2>Oczekuj na dalsze informacje! 🎁✨</h2>
-      `;
-      addConfetti();  
+      }
       break;
   }
 }
@@ -190,6 +195,40 @@ function addEmojis(list){
     emoji.textContent = list[Math.floor(Math.random() * list.length)];
     result.appendChild(emoji);
   }
+}
+
+// --- Konfetti ---
+let confettiPieces = [];
+function startConfetti() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+  for(let i=0; i<150; i++){
+    confettiPieces.push({
+      x: Math.random()*confettiCanvas.width,
+      y: Math.random()*confettiCanvas.height - confettiCanvas.height,
+      r: Math.random()*6+4,
+      d: Math.random()*150+50,
+      color: `hsl(${Math.random()*360},100%,50%)`,
+      tilt: Math.random()*10-10
+    });
+  }
+  requestAnimationFrame(drawConfetti);
+}
+function drawConfetti(){
+  confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  for(let i=0;i<confettiPieces.length;i++){
+    let p = confettiPieces[i];
+    confettiCtx.beginPath();
+    confettiCtx.lineWidth = p.r;
+    confettiCtx.strokeStyle = p.color;
+    confettiCtx.moveTo(p.x+p.tilt,p.y);
+    confettiCtx.lineTo(p.x+p.tilt,p.y+p.r);
+    confettiCtx.stroke();
+    p.y += 2;
+    p.tilt += 0.1;
+    if(p.y > confettiCanvas.height){ p.y = -10; p.x = Math.random()*confettiCanvas.width; }
+  }
+  requestAnimationFrame(drawConfetti);
 }
 </script>
 
