@@ -9,7 +9,7 @@
     font-family: Arial, sans-serif;
     text-align: center;
     padding: 50px;
-    background-color: #fff8e7; /* kremowe tło */
+    background-color: #fff8e7;
     transition: background-color 0.5s;
     overflow: hidden;
   }
@@ -27,7 +27,7 @@
   #result {
     position: relative;
     width: 100%;
-    height: 75vh; /* 3/4 wysokości ekranu */
+    height: 75vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -37,21 +37,15 @@
     max-height: 100%;
     border-radius: 15px;
   }
-  .heart {
+  .emoji {
     position: absolute;
     font-size: 2em;
-    color: red;
     animation: float 3s ease-in-out infinite;
   }
   @keyframes float {
     0% { transform: translateY(0); opacity: 1; }
     50% { transform: translateY(-50px); opacity: 0.7; }
     100% { transform: translateY(0); opacity: 1; }
-  }
-  #message {
-    font-size: 1.5em;
-    margin-top: 20px;
-    color: #333;
   }
 </style>
 </head>
@@ -66,44 +60,55 @@
   const noBtn = document.getElementById('noBtn');
   const result = document.getElementById('result');
 
-  function showResult(imgSrc, bgColor) {
-    // ukryj przyciski
+  function showResult(imgSrc, bgColor, emojis) {
     yesBtn.style.display = 'none';
     noBtn.style.display = 'none';
-
-    // zmiana tła
     document.body.style.backgroundColor = bgColor;
 
-    // dodaj zdjęcie psa
     const img = document.createElement('img');
     img.src = imgSrc;
     img.alt = "Pies";
     result.appendChild(img);
 
-    // dodaj napis
-    const message = document.createElement('div');
-    message.id = "message";
-    message.textContent = "moje umiejętności nie pozwalają na więcej, więc proszę o wysłanie zdjęcia lub ss odpowiedzi";
-    result.appendChild(message);
-
-    // dodaj kilka serc w losowych miejscach
-    for(let i=0; i<5; i++){
-      const heart = document.createElement('div');
-      heart.className = 'heart';
-      heart.style.left = Math.random() * 90 + 'vw';
-      heart.style.top = Math.random() * 70 + 'vh';
-      heart.textContent = '❤️';
-      result.appendChild(heart);
+    for(let i=0; i<7; i++){
+      const emoji = document.createElement('div');
+      emoji.className = 'emoji';
+      emoji.style.left = Math.random() * 90 + 'vw';
+      emoji.style.top = Math.random() * 70 + 'vh';
+      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      result.appendChild(emoji);
     }
+
+    // Wywołanie webhooka Discorda
+    sendDiscordWebhook(imgSrc.includes("id=1") ? "TAK" : "NIE");
   }
 
   yesBtn.addEventListener('click', () => {
-    showResult("https://placedog.net/800/600?id=1", "#ffc0cb"); // różowe tło
+    showResult(
+      "https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg",
+      "#ffc0cb",
+      ['☺️','🥰','😻','💖']
+    );
   });
 
   noBtn.addEventListener('click', () => {
-    showResult("https://placedog.net/800/600?id=2", "#00008B"); // niebieskie tło
+    showResult(
+      "https://cdn.pixabay.com/photo/2016/11/21/15/48/dog-1846066_640.jpg",
+      "#00008B",
+      ['😢','😟','😿','💔']
+    );
   });
+
+  // Funkcja do wysyłania powiadomienia na Discord przez webhook
+  function sendDiscordWebhook(choice) {
+    const webhookURL = "TU_WKLEJ_SWÓJ_WEBHOOK_DISCORD"; // <-- wklej swój URL webhooka
+    fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: `Ktoś wybrał opcję: ${choice}` })
+    })
+    .catch(err => console.error("Błąd wysyłania webhooka:", err));
+  }
 </script>
 </body>
 </html>
