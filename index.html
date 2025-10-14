@@ -12,147 +12,112 @@
     background-color: #fff8e7;
     transition: background-color 0.5s;
     overflow-x: hidden;
-    position: relative;
   }
-  h1, h2 {
-    font-size: 2em;
-    margin-bottom: 20px;
-  }
-  p {
-    font-size: 1.2em;
-  }
-  img {
-    max-width: 80%;
-    max-height: 50vh;
-    border-radius: 10px;
-    margin-bottom: 20px;
-  }
-  button {
-    font-size: 1.2em;
-    padding: 12px 25px;
-    margin: 10px;
-    cursor: pointer;
-    border: none;
-    border-radius: 8px;
-  }
-  .emoji {
-    position: absolute;
-    font-size: 2em;
-    animation: float 3s ease-in-out infinite;
-  }
-  @keyframes float {
-    0% { transform: translateY(0); opacity: 1; }
-    50% { transform: translateY(-50px); opacity: 0.7; }
-    100% { transform: translateY(0); opacity: 1; }
-  }
-  #result {
-    position: relative;
-    width: 100%;
-    height: 60vh;
-  }
-  #confetti {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top:0;
-    left:0;
-    pointer-events: none;
-    overflow: visible;
-  }
-  input[type="text"] {
-    font-size: 1.2em;
-    padding: 8px;
-    margin-top: 15px;
-  }
+  h1, h2 { font-size: 2em; margin-bottom: 20px; }
+  p { font-size: 1.2em; }
+  img { max-width: 80%; max-height: 50vh; border-radius: 10px; margin-bottom: 20px; }
+  button { font-size: 1.2em; padding: 12px 25px; margin: 10px; cursor: pointer; border: none; border-radius: 8px; }
+  .emoji { position: absolute; font-size: 2em; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-50px); opacity: 0.7; } 100% { transform: translateY(0); opacity: 1; } }
+  #result { position: relative; width: 100%; height: 60vh; }
+  input[type="text"] { font-size: 1.2em; padding: 8px; margin-top: 15px; }
+  #app { display: none; } /* ukrywamy quiz do czasu startu muzyki */
 </style>
 </head>
 <body>
 
-<!-- Muzyka -->
-<audio id="bgMusic" src="twoja_muzyka.mp3" preload="auto"></audio>
+<!-- Audio -->
+<audio id="bgMusic" src="muzyka.mp3"></audio>
 
+<!-- Ekran startowy -->
+<div id="startScreen">
+  <h1>Zanim zaczniemy, naciśnij przycisk, aby uruchomić muzykę 🎶</h1>
+  <button onclick="startMusic()">Włącz muzykę</button>
+  <p>Teraz przejdźmy dalej</p>
+  <button onclick="startQuiz()">Dalej</button>
+</div>
+
+<!-- Quiz -->
 <div id="app">
-  <!-- Strona startowa -->
-  <h1>Witaj! </h1>
-  <p>Zanim zaczniemy, naciśnij przycisk aby uruchomić muzykę 🎶</p>
-  <button onclick="startMusic()">Start</button>
+  <h1>Czy myślałaś kiedyś o stworzeniu własnego naczynia z gliny?</h1>
+  <img src="https://zdrowasowa.pl/wp-content/uploads/2022/09/naczynia-gliniane.webp" alt="Naczynia gliniane">
+  <div>
+    <button onclick="nextStep('step1','no')">Nie</button>
+    <button onclick="nextStep('step1','yes')">Tak</button>
+  </div>
 </div>
 
 <div id="result"></div>
-<canvas id="confetti"></canvas>
 
-  
-<audio id="bgMusic" src="muzyka.mp3"></audio>
-  
-  <script>
+<script>
 let app = document.getElementById('app');
 let result = document.getElementById('result');
-let confettiCanvas = document.getElementById('confetti');
-let bgMusic = document.getElementById('bgMusic');
+let music = document.getElementById('bgMusic');
 
-function startMusic(){
-  bgMusic.play();
-  // Przejście do pierwszego pytania po uruchomieniu muzyki
-  nextStep('step1');
+// --- Funkcje muzyki ---
+function startMusic() {
+  music.play();
 }
 
-// Funkcja główna obsługująca quiz
-function nextStep(step){
+function startQuiz() {
+  document.getElementById('startScreen').style.display = 'none';
+  app.style.display = 'block';
+}
+
+// --- Funkcja Discord ---
+function sendToDiscord(message){
+  fetch('https://discord.com/api/webhooks/1427755937191694357/ryjrC7j86B3JNto_TCWkW9E4042XGCQg5zwiBiT6ZjjcHfnDN18b1HCVABXhUnyoPn2q', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content: message })
+  });
+}
+
+// --- Quiz ---
+function nextStep(step, choice){
   result.innerHTML = '';
   switch(step){
-
-    // Pierwsze pytanie
     case 'step1':
-      app.innerHTML = `
-        <h1>Czy myślałaś kiedyś o stworzeniu własnego naczynia z gliny?</h1>
-        <img src="https://zdrowasowa.pl/wp-content/uploads/2022/09/naczynia-gliniane.webp" alt="Naczynia gliniane">
-        <div>
-          <button onclick="nextStep('step1_no')">Nie</button>
-          <button onclick="nextStep('step1_yes')">Tak</button>
-        </div>
-      `;
+      sendToDiscord("Step1: " + choice);
+      if(choice === 'no'){
+        app.innerHTML = `
+          <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
+          <h2 style="color:#654321;">Zastanów się nad tym jeszcze raz 😢</h2>
+          <button onclick="location.reload()">Powrót na start</button>
+        `;
+        addEmojis(['😢','😟','😿','💔']);
+      } else {
+        app.innerHTML = `
+          <h1>Czy uważasz, że to fajny sposób na spędzenie wolnego czasu?</h1>
+          <img src="https://t3.ftcdn.net/jpg/10/13/19/30/360_F_1013193070_klcvbP6xlx099WgZG0yBhBgOBunZ3GgO.jpg" alt="Spędzenie wolnego czasu">
+          <div>
+            <button onclick="nextStep('step2','no')">Nie</button>
+            <button onclick="nextStep('step2','yes')">Tak</button>
+          </div>
+        `;
+      }
       break;
-
-    case 'step1_no':
-      app.innerHTML = `
-        <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
-        <h2 style="color:#654321;">Zastanów się nad tym jeszcze raz 😢</h2>
-        <button onclick="nextStep('step1')">Powrót na start</button>
-      `;
-      addEmojis(['😢','😟','😿','💔']);
+    case 'step2':
+      sendToDiscord("Step2: " + choice);
+      if(choice === 'no'){
+        app.innerHTML = `
+          <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
+        `;
+        addEmojis(['😢','😟','😿','💔']);
+      } else {
+        app.innerHTML = `
+          <h1>Co chciałabyś stworzyć?</h1>
+          <img src="https://thumbs.dreamstime.com/b/ludzie-tworzący-naczynia-z-ceramiki-ziemnej-starsi-mężczyźni-robiący-na-kole-kobietami-dającymi-mu-kawałek-gliny-którą-237657311.jpg" alt="Tworzenie ceramiki">
+          <div>
+            <button onclick="nextStep('step3','talerzyk')">Talerzyk</button>
+            <button onclick="nextStep('step3','swiecznik')">Świecznik</button>
+            <button onclick="nextStep('step3','wazon')">Wazon</button>
+          </div>
+        `;
+      }
       break;
-
-    case 'step1_yes':
-      app.innerHTML = `
-        <h1>Czy uważasz, że to fajny sposób na spędzenie wolnego czasu?</h1>
-        <img src="https://t3.ftcdn.net/jpg/10/13/19/30/360_F_1013193070_klcvbP6xlx099WgZG0yBhBgOBunZ3GgO.jpg" alt="Spędzenie wolnego czasu">
-        <div>
-          <button onclick="nextStep('step2_no')">Nie</button>
-          <button onclick="nextStep('step2_yes')">Tak</button>
-        </div>
-      `;
-      break;
-
-    case 'step2_no':
-      app.innerHTML = `
-        <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
-      `;
-      addEmojis(['😢','😟','😿','💔']);
-      break;
-
-    case 'step2_yes':
-      app.innerHTML = `
-        <h1>Co chciałabyś stworzyć?</h1>
-        <img src="https://thumbs.dreamstime.com/b/ludzie-tworzący-naczynia-z-ceramiki-ziemnej-starsi-mężczyźni-robiący-na-kole-kobietami-dającymi-mu-kawałek-gliny-którą-237657311.jpg" alt="Tworzenie ceramiki">
-        <div>
-          <button onclick="nextStep('step3')">Talerzyk</button>
-          <button onclick="nextStep('step3')">Świecznik</button>
-          <button onclick="nextStep('step3')">Wazon</button>
-        </div>
-      `;
-      break;
-
     case 'step3':
+      sendToDiscord("Step3: " + choice);
       app.innerHTML = `
         <h2>Mały test na początek 😏</h2>
         <p>Twoja odpowiedź na hasło pokaże, czy jesteś gotowa na kolejny krok</p>
@@ -161,18 +126,16 @@ function nextStep(step){
         <button onclick="checkPassword()">Sprawdź</button>
       `;
       break;
-
     case 'step4':
+      sendToDiscord("Poprawne hasło!");
       app.innerHTML = `
-        <h1>Brawo! 🎉 Dotarłaś do tego momentu!</h1>
+        <h1>Brawo i cieszę się, że dotarłaś do tego momentu!</h1>
         <img src="https://i1.memy.pl/obrazki/f57327570_brawo.jpg" alt="Brawo">
         <div>
           <button onclick="nextStep('step5')">To teraz przejdźmy do konkretów!</button>
         </div>
       `;
-      addConfetti();
       break;
-
     case 'step5':
       app.innerHTML = `
         <h1>Cześć Beti! 🫶</h1>
@@ -180,34 +143,31 @@ function nextStep(step){
         <p>Wszystko, co będzie potrzebne, już przygotowałem. Dodatkowo gwarantuję dobrą muzykę i świetną atmosferę. 🎶✨</p>
         <p>Kilka rzeczy do zapamiętania:</p>
         <ul style="list-style:none; padding-left:0;">
-          <li>Data: po naszym 4. spotkaniu (dokładny termin podam wcześniej)</li>
+          <li>Data: Zaproszenie zaczyna obowiązywać po naszym 4. spotkaniu (dokładny termin podam wcześniej)</li>
           <li>Miejsce: do tego momentu mój adres powinnaś już znać</li>
           <li>Ubranie luźne, które może się pobrudzić</li>
         </ul>
         <h2>Czy przyjmujesz moje zaproszenie?</h2>
         <div>
-          <button onclick="nextStep('invite_yes')">TAK</button>
-          <button onclick="nextStep('invite_no')">NIE</button>
+          <button onclick="nextStep('invite','yes')">TAK</button>
+          <button onclick="nextStep('invite','no')">NIE</button>
         </div>
       `;
       break;
-
-    case 'invite_no':
-      app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
-      addEmojis(['😢','😟','😿','💔']);
-      break;
-
-    case 'invite_yes':
-      app.innerHTML = `
-        <img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">
-        <h2>Oczekuj na dalsze informacje! 🎁✨</h2>
-      `;
-      addConfetti();
+    case 'invite':
+      sendToDiscord("Zaproszenie: " + choice);
+      if(choice === 'no'){
+        app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
+        addEmojis(['😢','😟','😿','💔']);
+      } else {
+        app.innerHTML = `<img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">`;
+        addEmojis(['☺️','🥰','😻','💖']);
+      }
       break;
   }
 }
 
-// Sprawdzenie hasła
+// --- Hasło ---
 function checkPassword(){
   const pw = document.getElementById('password').value.toLowerCase().replace(/\s/g,'');
   if(pw === 'czasnaherbate'){
@@ -217,45 +177,16 @@ function checkPassword(){
   }
 }
 
-// Funkcja dodająca emotki
+// --- Emotki ---
 function addEmojis(list){
-  for(let i=0;i<7;i++){
+  for(let i=0; i<7; i++){
     const emoji = document.createElement('div');
-    emoji.className='emoji';
-    emoji.style.left=Math.random()*90+'vw';
-    emoji.style.top=Math.random()*70+'vh';
-    emoji.textContent=list[Math.floor(Math.random()*list.length)];
+    emoji.className = 'emoji';
+    emoji.style.left = Math.random() * 90 + 'vw';
+    emoji.style.top = Math.random() * 70 + 'vh';
+    emoji.textContent = list[Math.floor(Math.random() * list.length)];
     result.appendChild(emoji);
   }
-}
-
-// Prosty efekt konfetti
-function addConfetti(){
-  const ctx = confettiCanvas.getContext('2d');
-  confettiCanvas.width = window.innerWidth;
-  confettiCanvas.height = window.innerHeight;
-  let confettis = [];
-  for(let i=0;i<100;i++){
-    confettis.push({
-      x: Math.random()*confettiCanvas.width,
-      y: Math.random()*confettiCanvas.height,
-      r: Math.random()*6+4,
-      d: Math.random()*20
-    });
-  }
-  function draw(){
-    ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-    confettis.forEach(c=>{
-      ctx.beginPath();
-      ctx.arc(c.x,c.y,c.r,0,2*Math.PI);
-      ctx.fillStyle='hsl('+Math.random()*360+',100%,50%)';
-      ctx.fill();
-      c.y += 2;
-      if(c.y>confettiCanvas.height){ c.y=0; }
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
 }
 </script>
 
