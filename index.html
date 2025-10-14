@@ -51,12 +51,11 @@
 
 <div id="app">
   <!-- Strona startowa z muzyką -->
+ <div id="app">
   <h1>Witaj! 🫶</h1>
   <p>Zanim zaczniemy, naciśnij przycisk, aby uruchomić muzykę i ożywić stronę!</p>
   <button onclick="startMusic()">Uruchom muzykę 🎵</button>
 </div>
-
-<div id="result"></div>
 
 <audio id="bgMusic" src="muzyka.mp3"></audio>
 
@@ -65,15 +64,15 @@ let app = document.getElementById('app');
 let result = document.getElementById('result');
 let music = document.getElementById('bgMusic');
 
-// Funkcja uruchamia muzykę
 function startMusic() {
   music.play();
   app.innerHTML = `
     <p>Muzyka gra! 🎶</p>
-    <button onclick="nextStep('step0')">Przejdź dalej ➡️</button>
+    <button onclick="nextStep('step1')">Przejdź dalej ➡️</button>
   `;
   addEmojis(['🎵','🎶','✨','💖','😻']);
 }
+</script>
 
 // Krok 0 – pierwsza strona po muzyce
 function nextStep(step, choice){
