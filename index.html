@@ -3,39 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zaproszenie</title>
+<title>Interaktywne Zaproszenie</title>
 <style>
   body {
     font-family: Arial, sans-serif;
     text-align: center;
-    padding: 50px;
+    padding: 30px;
     background-color: #fff8e7;
     transition: background-color 0.5s;
-    overflow: hidden;
+    overflow-x: hidden;
   }
-  h1 {
+  h1, h2 {
     font-size: 2em;
+    margin-bottom: 20px;
+  }
+  img {
+    max-width: 80%;
+    max-height: 50vh;
+    border-radius: 10px;
+    margin-bottom: 20px;
   }
   button {
     font-size: 1.2em;
-    padding: 15px 30px;
-    margin: 20px;
+    padding: 12px 25px;
+    margin: 10px;
     cursor: pointer;
     border: none;
     border-radius: 8px;
-  }
-  #result {
-    position: relative;
-    width: 100%;
-    height: 75vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  #result img {
-    max-height: 100%;
-    border-radius: 15px;
   }
   .emoji {
     position: absolute;
@@ -47,68 +41,159 @@
     50% { transform: translateY(-50px); opacity: 0.7; }
     100% { transform: translateY(0); opacity: 1; }
   }
+  #result {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+  }
+  input[type="text"] {
+    font-size: 1.2em;
+    padding: 8px;
+    margin-top: 15px;
+  }
 </style>
 </head>
 <body>
-  <h1>Czy przyjmujesz zaproszenie?</h1>
-  <button id="yesBtn">TAK</button>
-  <button id="noBtn">NIE</button>
-  <div id="result"></div>
+
+<div id="app">
+  <h1>Czy myślałaś kiedyś o stworzeniu własnego naczynia z gliny?</h1>
+  <img src="https://zdrowasowa.pl/wp-content/uploads/2022/09/naczynia-gliniane.webp" alt="Naczynia gliniane">
+  <div>
+    <button onclick="nextStep('step1','no')">Nie</button>
+    <button onclick="nextStep('step1','yes')">Tak</button>
+  </div>
+</div>
+
+<div id="result"></div>
 
 <script>
-  const yesBtn = document.getElementById('yesBtn');
-  const noBtn = document.getElementById('noBtn');
-  const result = document.getElementById('result');
+let app = document.getElementById('app');
+let result = document.getElementById('result');
 
-  function showResult(imgSrc, bgColor, emojis) {
-    yesBtn.style.display = 'none';
-    noBtn.style.display = 'none';
-    document.body.style.backgroundColor = bgColor;
+function nextStep(step, choice){
+  result.innerHTML = '';
+  switch(step){
 
-    const img = document.createElement('img');
-    img.src = imgSrc;
-    img.alt = "Pies";
-    result.appendChild(img);
+    // Krok 1: Pierwsze pytanie
+    case 'step1':
+      if(choice === 'no'){
+        app.innerHTML = `
+          <img src="https://placedog.net/800/600?id=2" alt="Smutny pies">
+          <h2 style="color:white;">Zastanów się nad tym jeszcze raz 😢</h2>
+        `;
+        addEmojis(['😢','😟','😿','💔']);
+      } else {
+        // przejście do drugiego pytania
+        app.innerHTML = `
+          <h1>Czy uważasz, że to fajny sposób na spędzenie wolnego czasu?</h1>
+          <img src="https://t3.ftcdn.net/jpg/10/13/19/30/360_F_1013193070_klcvbP6xlx099WgZG0yBhBgOBunZ3GgO.jpg" alt="Spędzenie wolnego czasu">
+          <div>
+            <button onclick="nextStep('step2','no')">Nie</button>
+            <button onclick="nextStep('step2','yes')">Tak</button>
+          </div>
+        `;
+      }
+      break;
 
-    for(let i=0; i<7; i++){
-      const emoji = document.createElement('div');
-      emoji.className = 'emoji';
-      emoji.style.left = Math.random() * 90 + 'vw';
-      emoji.style.top = Math.random() * 70 + 'vh';
-      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      result.appendChild(emoji);
-    }
+    // Krok 2: Drugie pytanie
+    case 'step2':
+      if(choice === 'no'){
+        app.innerHTML = `
+          <img src="https://placedog.net/800/600?id=2" alt="Smutny pies">
+        `;
+        addEmojis(['😢','😟','😿','💔']);
+      } else {
+        // przejście do trzeciego pytania
+        app.innerHTML = `
+          <h1>Co chciałabyś stworzyć?</h1>
+          <img src="https://thumbs.dreamstime.com/b/ludzie-tworzący-naczynia-z-ceramiki-ziemnej-starsi-mężczyźni-robiący-na-kole-kobietami-dającymi-mu-kawałek-gliny-którą-237657311.jpg" alt="Tworzenie ceramiki">
+          <div>
+            <button onclick="nextStep('step3','talerzyk')">Talerzyk</button>
+            <button onclick="nextStep('step3','swiecznik')">Świecznik</button>
+            <button onclick="nextStep('step3','wazon')">Wazon</button>
+          </div>
+        `;
+      }
+      break;
 
-    // Wywołanie webhooka Discorda
-    sendDiscordWebhook(imgSrc.includes("id=1") ? "TAK" : "NIE");
+    // Krok 3: Wybór obiektu
+    case 'step3':
+      // przejście do pytania z hasłem
+      app.innerHTML = `
+        <h1>Podaj hasło, aby przejść dalej:</h1>
+        <p>(Jak nazywała się herbaciarnia, w której byliśmy na pierwszym spotkaniu? bez polskich znaków)</p>
+        <input type="text" id="password" placeholder="Wpisz hasło">
+        <button onclick="checkPassword()">Sprawdź</button>
+      `;
+      break;
+
+    // Krok 4: Poprawne hasło
+    case 'step4':
+      app.innerHTML = `
+        <h1>Brawo i cieszę się, że dotarłaś do tego momentu!</h1>
+        <img src="https://i1.memy.pl/obrazki/f57327570_brawo.jpg" alt="Brawo">
+        <div>
+          <button onclick="nextStep('step5')">To teraz przejdźmy do konkretów!</button>
+        </div>
+      `;
+      break;
+
+    // Krok 5: Zaproszenie
+    case 'step5':
+      app.innerHTML = `
+        <h1>Cześć Beti! 🫶</h1>
+        <p>Chciałbym Cię zaprosić na wyjątkowy wieczór lepienia z gliny. 🎨✨</p>
+        <p>Wszystko, co będzie potrzebne, już przygotowałem. Dodatkowo gwarantuję dobrą muzykę i świetną atmosferę. 🎶✨</p>
+        <p>Kilka rzeczy do zapamiętania:</p>
+        <ul style="list-style:none; padding-left:0;">
+          <li>Data: po naszym 4. spotkaniu (dokładny termin podam wcześniej)</li>
+          <li>Miejsce: do tego momentu mój adres powinnaś już znać</li>
+          <li>Ubranie luźne, które może się pobrudzić</li>
+        </ul>
+        <p>Nie mogę się doczekać, żeby spędzić z Tobą trochę czasu w kreatywny i… nieco brudny sposób 😄.</p>
+        <h2>Czy przyjmujesz moje zaproszenie?</h2>
+        <div>
+          <button onclick="nextStep('invite','yes')">TAK</button>
+          <button onclick="nextStep('invite','no')">NIE</button>
+        </div>
+      `;
+      break;
+
+    // Krok 6: Zaproszenie TAK/NIE z emotkami
+    case 'invite':
+      if(choice === 'no'){
+        app.innerHTML = `<img src="https://placedog.net/800/600?id=2" alt="Smutny pies">`;
+        addEmojis(['😢','😟','😿','💔']);
+      } else {
+        app.innerHTML = `<img src="https://placedog.net/800/600?id=1" alt="Szczęśliwy pies">`;
+        addEmojis(['☺️','🥰','😻','💖']);
+      }
+      break;
   }
+}
 
-  yesBtn.addEventListener('click', () => {
-    showResult(
-      "https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg",
-      "#ffc0cb",
-      ['☺️','🥰','😻','💖']
-    );
-  });
-
-  noBtn.addEventListener('click', () => {
-    showResult(
-      "https://cdn.pixabay.com/photo/2016/11/21/15/48/dog-1846066_640.jpg",
-      "#00008B",
-      ['😢','😟','😿','💔']
-    );
-  });
-
-  // Funkcja do wysyłania powiadomienia na Discord przez webhook
-  function sendDiscordWebhook(choice) {
-    const webhookURL = "TU_WKLEJ_SWÓJ_WEBHOOK_DISCORD"; // <-- wklej swój URL webhooka
-    fetch(webhookURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: `Ktoś wybrał opcję: ${choice}` })
-    })
-    .catch(err => console.error("Błąd wysyłania webhooka:", err));
+// Funkcja sprawdzająca hasło
+function checkPassword(){
+  const pw = document.getElementById('password').value.toLowerCase();
+  if(pw === 'czasnaherbate'){
+    nextStep('step4');
+  } else {
+    alert("Niepoprawne hasło, spróbuj ponownie!");
   }
+}
+
+// Funkcja do dodawania emotek
+function addEmojis(list){
+  for(let i=0; i<7; i++){
+    const emoji = document.createElement('div');
+    emoji.className = 'emoji';
+    emoji.style.left = Math.random() * 90 + 'vw';
+    emoji.style.top = Math.random() * 70 + 'vh';
+    emoji.textContent = list[Math.floor(Math.random() * list.length)];
+    result.appendChild(emoji);
+  }
+}
 </script>
+
 </body>
 </html>
