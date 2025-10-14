@@ -13,125 +13,86 @@
     transition: background-color 0.5s;
     overflow-x: hidden;
   }
-  h1, h2 { font-size: 2em; margin-bottom: 20px; }
+  h1, h2, p {
+    margin-bottom: 20px;
+  }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.8em; }
   p { font-size: 1.2em; }
   img { max-width: 80%; max-height: 50vh; border-radius: 10px; margin-bottom: 20px; }
-  button { font-size: 1.2em; padding: 12px 25px; margin: 10px; cursor: pointer; border: none; border-radius: 8px; }
-  .emoji { position: absolute; font-size: 2em; animation: float 3s ease-in-out infinite; }
-  @keyframes float { 0% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-50px); opacity: 0.7; } 100% { transform: translateY(0); opacity: 1; } }
+  button {
+    font-size: 1.2em;
+    padding: 12px 25px;
+    margin: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    transition: 0.3s;
+  }
+  button:hover {
+    transform: scale(1.1);
+    background-color: #ffcc00;
+  }
+  .emoji {
+    position: absolute;
+    font-size: 2em;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(-50px); opacity: 0.7; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
   #result { position: relative; width: 100%; height: 60vh; }
   input[type="text"] { font-size: 1.2em; padding: 8px; margin-top: 15px; }
-  #app { display: none; } /* ukrywamy quiz do czasu startu muzyki */
 </style>
 </head>
 <body>
 
-<!-- Audio -->
-<audio id="bgMusic" src="muzyka.mp3"></audio>
-
-<!-- Ekran startowy -->
-<div id="startScreen" style="position:relative; overflow:hidden;">
-  <h1 style="animation: bounce 1.5s infinite;">Zanim zaczniemy, naciśnij przycisk, aby uruchomić muzykę 🎶</h1>
-  
-  <!-- Ruchome emotki -->
-  <div id="startEmojis"></div>
-
-  <!-- Przyciski -->
-  <button onclick="startMusic()" style="animation: pulse 2s infinite;">Włącz muzykę</button>
-  <p style="margin-top:20px; animation: fade 2s infinite alternate;">Teraz przejdźmy dalej</p>
-  <button onclick="startQuiz()" style="animation: pulse 2s infinite;">Dalej</button>
-</div>
-
-<style>
-/* Animacja emotek startowych */
-@keyframes floatEmoji {
-  0% { transform: translateY(0) scale(1); opacity: 1; }
-  50% { transform: translateY(-40px) scale(1.2); opacity: 0.7; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-
-/* Animacja bounce dla nagłówka */
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
-}
-
-/* Animacja pulsowania przycisku */
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-/* Animacja fade dla napisu */
-@keyframes fade {
-  from { opacity: 0.6; }
-  to { opacity: 1; }
-}
-</style>
-
-<script>
-// Dodawanie losowych emotek w tle
-function spawnStartEmojis() {
-  const container = document.getElementById('startEmojis');
-  const emojis = ['🎨','🎶','✨','🫶','😊','💖','🐶'];
-  for(let i=0; i<10; i++){
-    const emoji = document.createElement('div');
-    emoji.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-    emoji.style.position = 'absolute';
-    emoji.style.left = Math.random()*90 + 'vw';
-    emoji.style.top = Math.random()*70 + 'vh';
-    emoji.style.fontSize = (20+Math.random()*30) + 'px';
-    emoji.style.animation = `floatEmoji ${2+Math.random()*2}s ease-in-out infinite`;
-    container.appendChild(emoji);
-  }
-}
-
-spawnStartEmojis();
-</script>
-
-<!-- Quiz -->
 <div id="app">
-  <h1>Czy myślałaś kiedyś o stworzeniu własnego naczynia z gliny?</h1>
-  <img src="https://zdrowasowa.pl/wp-content/uploads/2022/09/naczynia-gliniane.webp" alt="Naczynia gliniane">
-  <div>
-    <button onclick="nextStep('step1','no')">Nie</button>
-    <button onclick="nextStep('step1','yes')">Tak</button>
-  </div>
+  <!-- Strona startowa z muzyką -->
+  <h1>Witaj! 🫶</h1>
+  <p>Zanim zaczniemy, naciśnij przycisk, aby uruchomić muzykę i ożywić stronę!</p>
+  <button onclick="startMusic()">Uruchom muzykę 🎵</button>
 </div>
 
 <div id="result"></div>
+
+<audio id="bgMusic" src="muzyka.mp3"></audio>
 
 <script>
 let app = document.getElementById('app');
 let result = document.getElementById('result');
 let music = document.getElementById('bgMusic');
 
-// --- Funkcje muzyki ---
+// Funkcja uruchamia muzykę
 function startMusic() {
   music.play();
+  app.innerHTML = `
+    <p>Muzyka gra! 🎶</p>
+    <button onclick="nextStep('step0')">Przejdź dalej ➡️</button>
+  `;
+  addEmojis(['🎵','🎶','✨','💖','😻']);
 }
 
-function startQuiz() {
-  document.getElementById('startScreen').style.display = 'none';
-  app.style.display = 'block';
-}
-
-// --- Funkcja Discord ---
-function sendToDiscord(message){
-  fetch('https://discord.com/api/webhooks/1427755937191694357/ryjrC7j86B3JNto_TCWkW9E4042XGCQg5zwiBiT6ZjjcHfnDN18b1HCVABXhUnyoPn2q', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content: message })
-  });
-}
-
-// --- Quiz ---
+// Krok 0 – pierwsza strona po muzyce
 function nextStep(step, choice){
   result.innerHTML = '';
   switch(step){
+    case 'step0':
+      app.innerHTML = `
+        <h1>Czy myślałaś kiedyś o stworzeniu własnego naczynia z gliny?</h1>
+        <img src="https://zdrowasowa.pl/wp-content/uploads/2022/09/naczynia-gliniane.webp" alt="Naczynia gliniane">
+        <div>
+          <button onclick="nextStep('step1','no')">Nie</button>
+          <button onclick="nextStep('step1','yes')">Tak</button>
+        </div>
+      `;
+      break;
+
+    // Krok 1
     case 'step1':
-      sendToDiscord("Step1: " + choice);
-      if(choice === 'no'){
+      if(choice==='no'){
         app.innerHTML = `
           <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
           <h2 style="color:#654321;">Zastanów się nad tym jeszcze raz 😢</h2>
@@ -149,12 +110,11 @@ function nextStep(step, choice){
         `;
       }
       break;
+
+    // Krok 2
     case 'step2':
-      sendToDiscord("Step2: " + choice);
-      if(choice === 'no'){
-        app.innerHTML = `
-          <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
-        `;
+      if(choice==='no'){
+        app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
         addEmojis(['😢','😟','😿','💔']);
       } else {
         app.innerHTML = `
@@ -168,8 +128,9 @@ function nextStep(step, choice){
         `;
       }
       break;
+
+    // Krok 3 – hasło
     case 'step3':
-      sendToDiscord("Step3: " + choice);
       app.innerHTML = `
         <h2>Mały test na początek 😏</h2>
         <p>Twoja odpowiedź na hasło pokaże, czy jesteś gotowa na kolejny krok</p>
@@ -178,8 +139,9 @@ function nextStep(step, choice){
         <button onclick="checkPassword()">Sprawdź</button>
       `;
       break;
+
+    // Krok 4 – poprawne hasło
     case 'step4':
-      sendToDiscord("Poprawne hasło!");
       app.innerHTML = `
         <h1>Brawo i cieszę się, że dotarłaś do tego momentu!</h1>
         <img src="https://i1.memy.pl/obrazki/f57327570_brawo.jpg" alt="Brawo">
@@ -188,14 +150,15 @@ function nextStep(step, choice){
         </div>
       `;
       break;
+
+    // Krok 5 – zaproszenie
     case 'step5':
       app.innerHTML = `
         <h1>Cześć Beti! 🫶</h1>
         <p>Chciałbym Cię zaprosić na wyjątkowy wieczór lepienia z gliny. 🎨✨</p>
         <p>Wszystko, co będzie potrzebne, już przygotowałem. Dodatkowo gwarantuję dobrą muzykę i świetną atmosferę. 🎶✨</p>
-        <p>Kilka rzeczy do zapamiętania:</p>
         <ul style="list-style:none; padding-left:0;">
-          <li>Data: Zaproszenie zaczyna obowiązywać po naszym 4. spotkaniu (dokładny termin podam wcześniej)</li>
+          <li>Data: po naszym 4. spotkaniu (dokładny termin podam wcześniej)</li>
           <li>Miejsce: do tego momentu mój adres powinnaś już znać</li>
           <li>Ubranie luźne, które może się pobrudzić</li>
         </ul>
@@ -206,41 +169,21 @@ function nextStep(step, choice){
         </div>
       `;
       break;
+
+    // Krok 6 – reakcja TAK/NIE
     case 'invite':
-      sendToDiscord("Zaproszenie: " + choice);
-      if(choice === 'no'){
+      if(choice==='no'){
         app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
         addEmojis(['😢','😟','😿','💔']);
       } else {
-        app.innerHTML = `<img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">`;
-        addEmojis(['☺️','🥰','😻','💖']);
+        app.innerHTML = `
+          <img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">
+          <h2>Dziękuję, że dotarłaś do końca! 😻✨<br>Oczekuj na dalsze informacje – przygoda dopiero się zaczyna.</h2>
+        `;
+        addConfetti(['🎉','✨','💖','😻']);
       }
       break;
   }
 }
 
-// --- Hasło ---
-function checkPassword(){
-  const pw = document.getElementById('password').value.toLowerCase().replace(/\s/g,'');
-  if(pw === 'czasnaherbate'){
-    nextStep('step4');
-  } else {
-    alert("Niepoprawne hasło, spróbuj ponownie!");
-  }
-}
-
-// --- Emotki ---
-function addEmojis(list){
-  for(let i=0; i<7; i++){
-    const emoji = document.createElement('div');
-    emoji.className = 'emoji';
-    emoji.style.left = Math.random() * 90 + 'vw';
-    emoji.style.top = Math.random() * 70 + 'vh';
-    emoji.textContent = list[Math.floor(Math.random() * list.length)];
-    result.appendChild(emoji);
-  }
-}
-</script>
-
-</body>
-</html>
+//
