@@ -73,7 +73,7 @@
 
 <div id="app">
   <!-- Strona startowa -->
-  <h1>Witaj! 🫶</h1>
+  <h1>Witaj! </h1>
   <p>Zanim zaczniemy, naciśnij przycisk aby uruchomić muzykę 🎶</p>
   <button onclick="startMusic()">Start</button>
 </div>
@@ -81,7 +81,10 @@
 <div id="result"></div>
 <canvas id="confetti"></canvas>
 
-<script>
+  
+<audio id="bgMusic" src="muzyka.mp3"></audio>
+  
+  <script>
 let app = document.getElementById('app');
 let result = document.getElementById('result');
 let confettiCanvas = document.getElementById('confetti');
