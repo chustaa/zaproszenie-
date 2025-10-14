@@ -13,13 +13,19 @@
     transition: background-color 0.5s;
     overflow-x: hidden;
   }
-  h1, h2, p {
+  h1, h2 {
+    font-size: 2em;
     margin-bottom: 20px;
   }
-  h1 { font-size: 2em; }
-  h2 { font-size: 1.8em; }
-  p { font-size: 1.2em; }
-  img { max-width: 80%; max-height: 50vh; border-radius: 10px; margin-bottom: 20px; }
+  p {
+    font-size: 1.2em;
+  }
+  img {
+    max-width: 80%;
+    max-height: 50vh;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
   button {
     font-size: 1.2em;
     padding: 12px 25px;
@@ -27,11 +33,6 @@
     cursor: pointer;
     border: none;
     border-radius: 8px;
-    transition: 0.3s;
-  }
-  button:hover {
-    transform: scale(1.1);
-    background-color: #ffcc00;
   }
   .emoji {
     position: absolute;
@@ -43,21 +44,29 @@
     50% { transform: translateY(-50px); opacity: 0.7; }
     100% { transform: translateY(0); opacity: 1; }
   }
-  #result { position: relative; width: 100%; height: 60vh; }
-  input[type="text"] { font-size: 1.2em; padding: 8px; margin-top: 15px; }
+  #result {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+  }
+  input[type="text"] {
+    font-size: 1.2em;
+    padding: 8px;
+    margin-top: 15px;
+  }
 </style>
 </head>
 <body>
 
 <div id="app">
-  <!-- Strona startowa z muzyką -->
- <div id="app">
   <h1>Witaj! 🫶</h1>
   <p>Zanim zaczniemy, naciśnij przycisk, aby uruchomić muzykę i ożywić stronę!</p>
   <button onclick="startMusic()">Uruchom muzykę 🎵</button>
 </div>
 
-<audio id="bgMusic" src="muzyka.mp3"></audio>
+<div id="result"></div>
+
+<audio id="bgMusic" src="muzyka.mp3" loop></audio>
 
 <script>
 let app = document.getElementById('app');
@@ -70,15 +79,16 @@ function startMusic() {
     <p>Muzyka gra! 🎶</p>
     <button onclick="nextStep('step1')">Przejdź dalej ➡️</button>
   `;
-  addEmojis(['🎵','🎶','✨','💖','😻']);
+  addEmojis(['🎵','🎶','✨','💖','😻','🌟']);
 }
-</script>
 
-// Krok 0 – pierwsza strona po muzyce
+// Funkcja główna obsługująca quiz
 function nextStep(step, choice){
   result.innerHTML = '';
   switch(step){
-    case 'step0':
+
+    // Krok 1: Pierwsze pytanie
+    case 'step1':
       app.innerHTML = `
         <h1>Czy myślałaś kiedyś o stworzeniu własnego naczynia z gliny?</h1>
         <img src="https://zdrowasowa.pl/wp-content/uploads/2022/09/naczynia-gliniane.webp" alt="Naczynia gliniane">
@@ -89,46 +99,47 @@ function nextStep(step, choice){
       `;
       break;
 
-    // Krok 1
-    case 'step1':
-      if(choice==='no'){
-        app.innerHTML = `
-          <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
-          <h2 style="color:#654321;">Zastanów się nad tym jeszcze raz 😢</h2>
-          <button onclick="location.reload()">Powrót na start</button>
-        `;
-        addEmojis(['😢','😟','😿','💔']);
-      } else {
-        app.innerHTML = `
-          <h1>Czy uważasz, że to fajny sposób na spędzenie wolnego czasu?</h1>
-          <img src="https://t3.ftcdn.net/jpg/10/13/19/30/360_F_1013193070_klcvbP6xlx099WgZG0yBhBgOBunZ3GgO.jpg" alt="Spędzenie wolnego czasu">
-          <div>
-            <button onclick="nextStep('step2','no')">Nie</button>
-            <button onclick="nextStep('step2','yes')">Tak</button>
-          </div>
-        `;
-      }
+    case 'step1_no':
+      app.innerHTML = `
+        <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
+        <h2 style="color:#654321;">Zastanów się nad tym jeszcze raz 😢</h2>
+        <button onclick="nextStep('step1')">Powrót na start</button>
+      `;
+      addEmojis(['😢','😟','😿','💔']);
+      break;
+
+    case 'step1_yes':
+      app.innerHTML = `
+        <h1>Czy uważasz, że to fajny sposób na spędzenie wolnego czasu?</h1>
+        <img src="https://t3.ftcdn.net/jpg/10/13/19/30/360_F_1013193070_klcvbP6xlx099WgZG0yBhBgOBunZ3GgO.jpg" alt="Spędzenie wolnego czasu">
+        <div>
+          <button onclick="nextStep('step2','no')">Nie</button>
+          <button onclick="nextStep('step2','yes')">Tak</button>
+        </div>
+      `;
       break;
 
     // Krok 2
-    case 'step2':
-      if(choice==='no'){
-        app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
-        addEmojis(['😢','😟','😿','💔']);
-      } else {
-        app.innerHTML = `
-          <h1>Co chciałabyś stworzyć?</h1>
-          <img src="https://thumbs.dreamstime.com/b/ludzie-tworzący-naczynia-z-ceramiki-ziemnej-starsi-mężczyźni-robiący-na-kole-kobietami-dającymi-mu-kawałek-gliny-którą-237657311.jpg" alt="Tworzenie ceramiki">
-          <div>
-            <button onclick="nextStep('step3','talerzyk')">Talerzyk</button>
-            <button onclick="nextStep('step3','swiecznik')">Świecznik</button>
-            <button onclick="nextStep('step3','wazon')">Wazon</button>
-          </div>
-        `;
-      }
+    case 'step2_no':
+      app.innerHTML = `
+        <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
+      `;
+      addEmojis(['😢','😟','😿','💔']);
       break;
 
-    // Krok 3 – hasło
+    case 'step2_yes':
+      app.innerHTML = `
+        <h1>Co chciałabyś stworzyć?</h1>
+        <img src="https://thumbs.dreamstime.com/b/ludzie-tworzący-naczynia-z-ceramiki-ziemnej-starsi-mężczyźni-robiący-na-kole-kobietami-dającymi-mu-kawałek-gliny-którą-237657311.jpg" alt="Tworzenie ceramiki">
+        <div>
+          <button onclick="nextStep('step3','talerzyk')">Talerzyk</button>
+          <button onclick="nextStep('step3','swiecznik')">Świecznik</button>
+          <button onclick="nextStep('step3','wazon')">Wazon</button>
+        </div>
+      `;
+      break;
+
+    // Krok 3: Hasło
     case 'step3':
       app.innerHTML = `
         <h2>Mały test na początek 😏</h2>
@@ -139,7 +150,6 @@ function nextStep(step, choice){
       `;
       break;
 
-    // Krok 4 – poprawne hasło
     case 'step4':
       app.innerHTML = `
         <h1>Brawo i cieszę się, że dotarłaś do tego momentu!</h1>
@@ -148,14 +158,16 @@ function nextStep(step, choice){
           <button onclick="nextStep('step5')">To teraz przejdźmy do konkretów!</button>
         </div>
       `;
+      addConfetti();
       break;
 
-    // Krok 5 – zaproszenie
+    // Zaproszenie
     case 'step5':
       app.innerHTML = `
         <h1>Cześć Beti! 🫶</h1>
         <p>Chciałbym Cię zaprosić na wyjątkowy wieczór lepienia z gliny. 🎨✨</p>
         <p>Wszystko, co będzie potrzebne, już przygotowałem. Dodatkowo gwarantuję dobrą muzykę i świetną atmosferę. 🎶✨</p>
+        <p>Kilka rzeczy do zapamiętania:</p>
         <ul style="list-style:none; padding-left:0;">
           <li>Data: po naszym 4. spotkaniu (dokładny termin podam wcześniej)</li>
           <li>Miejsce: do tego momentu mój adres powinnaś już znać</li>
@@ -169,20 +181,60 @@ function nextStep(step, choice){
       `;
       break;
 
-    // Krok 6 – reakcja TAK/NIE
-    case 'invite':
-      if(choice==='no'){
-        app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
-        addEmojis(['😢','😟','😿','💔']);
-      } else {
-        app.innerHTML = `
-          <img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">
-          <h2>Dziękuję, że dotarłaś do końca! 😻✨<br>Oczekuj na dalsze informacje – przygoda dopiero się zaczyna.</h2>
-        `;
-        addConfetti(['🎉','✨','💖','😻']);
-      }
+    case 'invite_no':
+      app.innerHTML = `<img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">`;
+      addEmojis(['😢','😟','😿','💔']);
+      break;
+
+    case 'invite_yes':
+      app.innerHTML = `
+        <h1>Szczęśliwe zakończenie! 🥰</h1>
+        <img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">
+        <p>Oczekuj na dalsze informacje… 🎉✨</p>
+      `;
+      addEmojis(['☺️','🥰','😻','💖']);
+      addConfetti();
       break;
   }
 }
 
-//
+// Sprawdzenie hasła
+function checkPassword(){
+  const pw = document.getElementById('password').value.toLowerCase().replace(/\s/g,'');
+  if(pw === 'czasnaherbate'){
+    nextStep('step4');
+  } else {
+    alert("Niepoprawne hasło, spróbuj ponownie!");
+  }
+}
+
+// Funkcja do dodawania emotek
+function addEmojis(list){
+  for(let i=0; i<10; i++){
+    const emoji = document.createElement('div');
+    emoji.className = 'emoji';
+    emoji.style.left = Math.random() * 90 + 'vw';
+    emoji.style.top = Math.random() * 70 + 'vh';
+    emoji.textContent = list[Math.floor(Math.random() * list.length)];
+    result.appendChild(emoji);
+  }
+}
+
+// Funkcja konfetti
+function addConfetti(){
+  for(let i=0; i<100; i++){
+    const confetti = document.createElement('div');
+    confetti.textContent = '🎉';
+    confetti.style.position = 'absolute';
+    confetti.style.left = Math.random()*100 + 'vw';
+    confetti.style.top = Math.random()*100 + 'vh';
+    confetti.style.fontSize = (10 + Math.random()*30) + 'px';
+    confetti.style.opacity = Math.random();
+    confetti.style.animation = `float ${3 + Math.random()*2}s ease-in-out infinite`;
+    document.body.appendChild(confetti);
+  }
+}
+</script>
+
+</body>
+</html>
