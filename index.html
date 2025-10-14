@@ -12,6 +12,7 @@
     background-color: #fff8e7;
     transition: background-color 0.5s;
     overflow-x: hidden;
+    position: relative;
   }
   h1, h2 {
     font-size: 2em;
@@ -49,6 +50,15 @@
     width: 100%;
     height: 60vh;
   }
+  #confetti {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left:0;
+    pointer-events: none;
+    overflow: visible;
+  }
   input[type="text"] {
     font-size: 1.2em;
     padding: 8px;
@@ -58,43 +68,44 @@
 </head>
 <body>
 
+<!-- Muzyka -->
+<audio id="bgMusic" src="twoja_muzyka.mp3" preload="auto"></audio>
+
 <div id="app">
+  <!-- Strona startowa -->
   <h1>Witaj! 🫶</h1>
-  <p>Zanim zaczniemy, naciśnij przycisk, aby uruchomić muzykę i ożywić stronę!</p>
-  <button onclick="startMusic()">Uruchom muzykę 🎵</button>
+  <p>Zanim zaczniemy, naciśnij przycisk aby uruchomić muzykę 🎶</p>
+  <button onclick="startMusic()">Start</button>
 </div>
 
 <div id="result"></div>
-
-<audio id="bgMusic" src="muzyka.mp3" loop></audio>
+<canvas id="confetti"></canvas>
 
 <script>
 let app = document.getElementById('app');
 let result = document.getElementById('result');
-let music = document.getElementById('bgMusic');
+let confettiCanvas = document.getElementById('confetti');
+let bgMusic = document.getElementById('bgMusic');
 
-function startMusic() {
-  music.play();
-  app.innerHTML = `
-    <p>Muzyka gra! 🎶</p>
-    <button onclick="nextStep('step1')">Przejdź dalej ➡️</button>
-  `;
-  addEmojis(['🎵','🎶','✨','💖','😻','🌟']);
+function startMusic(){
+  bgMusic.play();
+  // Przejście do pierwszego pytania po uruchomieniu muzyki
+  nextStep('step1');
 }
 
 // Funkcja główna obsługująca quiz
-function nextStep(step, choice){
+function nextStep(step){
   result.innerHTML = '';
   switch(step){
 
-    // Krok 1: Pierwsze pytanie
+    // Pierwsze pytanie
     case 'step1':
       app.innerHTML = `
         <h1>Czy myślałaś kiedyś o stworzeniu własnego naczynia z gliny?</h1>
         <img src="https://zdrowasowa.pl/wp-content/uploads/2022/09/naczynia-gliniane.webp" alt="Naczynia gliniane">
         <div>
-          <button onclick="nextStep('step1','no')">Nie</button>
-          <button onclick="nextStep('step1','yes')">Tak</button>
+          <button onclick="nextStep('step1_no')">Nie</button>
+          <button onclick="nextStep('step1_yes')">Tak</button>
         </div>
       `;
       break;
@@ -113,13 +124,12 @@ function nextStep(step, choice){
         <h1>Czy uważasz, że to fajny sposób na spędzenie wolnego czasu?</h1>
         <img src="https://t3.ftcdn.net/jpg/10/13/19/30/360_F_1013193070_klcvbP6xlx099WgZG0yBhBgOBunZ3GgO.jpg" alt="Spędzenie wolnego czasu">
         <div>
-          <button onclick="nextStep('step2','no')">Nie</button>
-          <button onclick="nextStep('step2','yes')">Tak</button>
+          <button onclick="nextStep('step2_no')">Nie</button>
+          <button onclick="nextStep('step2_yes')">Tak</button>
         </div>
       `;
       break;
 
-    // Krok 2
     case 'step2_no':
       app.innerHTML = `
         <img src="https://assets.puzzlefactory.com/puzzle/247/640/original.jpg" alt="Smutny pies">
@@ -132,14 +142,13 @@ function nextStep(step, choice){
         <h1>Co chciałabyś stworzyć?</h1>
         <img src="https://thumbs.dreamstime.com/b/ludzie-tworzący-naczynia-z-ceramiki-ziemnej-starsi-mężczyźni-robiący-na-kole-kobietami-dającymi-mu-kawałek-gliny-którą-237657311.jpg" alt="Tworzenie ceramiki">
         <div>
-          <button onclick="nextStep('step3','talerzyk')">Talerzyk</button>
-          <button onclick="nextStep('step3','swiecznik')">Świecznik</button>
-          <button onclick="nextStep('step3','wazon')">Wazon</button>
+          <button onclick="nextStep('step3')">Talerzyk</button>
+          <button onclick="nextStep('step3')">Świecznik</button>
+          <button onclick="nextStep('step3')">Wazon</button>
         </div>
       `;
       break;
 
-    // Krok 3: Hasło
     case 'step3':
       app.innerHTML = `
         <h2>Mały test na początek 😏</h2>
@@ -152,7 +161,7 @@ function nextStep(step, choice){
 
     case 'step4':
       app.innerHTML = `
-        <h1>Brawo i cieszę się, że dotarłaś do tego momentu!</h1>
+        <h1>Brawo! 🎉 Dotarłaś do tego momentu!</h1>
         <img src="https://i1.memy.pl/obrazki/f57327570_brawo.jpg" alt="Brawo">
         <div>
           <button onclick="nextStep('step5')">To teraz przejdźmy do konkretów!</button>
@@ -161,7 +170,6 @@ function nextStep(step, choice){
       addConfetti();
       break;
 
-    // Zaproszenie
     case 'step5':
       app.innerHTML = `
         <h1>Cześć Beti! 🫶</h1>
@@ -175,8 +183,8 @@ function nextStep(step, choice){
         </ul>
         <h2>Czy przyjmujesz moje zaproszenie?</h2>
         <div>
-          <button onclick="nextStep('invite','yes')">TAK</button>
-          <button onclick="nextStep('invite','no')">NIE</button>
+          <button onclick="nextStep('invite_yes')">TAK</button>
+          <button onclick="nextStep('invite_no')">NIE</button>
         </div>
       `;
       break;
@@ -188,53 +196,5 @@ function nextStep(step, choice){
 
     case 'invite_yes':
       app.innerHTML = `
-        <h1>Szczęśliwe zakończenie! 🥰</h1>
         <img src="https://d-pt.ppstatic.pl/kadry/k/r/1/90/c1/55c557c7119ac_o,size,445x270,q,71,h,c33c14.jpg" alt="Szczęśliwy pies">
-        <p>Oczekuj na dalsze informacje… 🎉✨</p>
-      `;
-      addEmojis(['☺️','🥰','😻','💖']);
-      addConfetti();
-      break;
-  }
-}
-
-// Sprawdzenie hasła
-function checkPassword(){
-  const pw = document.getElementById('password').value.toLowerCase().replace(/\s/g,'');
-  if(pw === 'czasnaherbate'){
-    nextStep('step4');
-  } else {
-    alert("Niepoprawne hasło, spróbuj ponownie!");
-  }
-}
-
-// Funkcja do dodawania emotek
-function addEmojis(list){
-  for(let i=0; i<10; i++){
-    const emoji = document.createElement('div');
-    emoji.className = 'emoji';
-    emoji.style.left = Math.random() * 90 + 'vw';
-    emoji.style.top = Math.random() * 70 + 'vh';
-    emoji.textContent = list[Math.floor(Math.random() * list.length)];
-    result.appendChild(emoji);
-  }
-}
-
-// Funkcja konfetti
-function addConfetti(){
-  for(let i=0; i<100; i++){
-    const confetti = document.createElement('div');
-    confetti.textContent = '🎉';
-    confetti.style.position = 'absolute';
-    confetti.style.left = Math.random()*100 + 'vw';
-    confetti.style.top = Math.random()*100 + 'vh';
-    confetti.style.fontSize = (10 + Math.random()*30) + 'px';
-    confetti.style.opacity = Math.random();
-    confetti.style.animation = `float ${3 + Math.random()*2}s ease-in-out infinite`;
-    document.body.appendChild(confetti);
-  }
-}
-</script>
-
-</body>
-</html>
+        <h2
